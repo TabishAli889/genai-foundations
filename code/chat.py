@@ -1,67 +1,60 @@
-import os
-from pyexpat import model
-from dotenv import load_dotenv
+# init_chat_model - GenAI - Chatbot - RAG
+# Provider Name + Model ? openai:gpt-6
+#create_agent - Agent AI - Agent - 
+
+from datetime import datetime
+
 from langchain.chat_models import init_chat_model
-#from langchain.messages import SystemMessage, HumanMessage, AIMessage
+from langchain.tools import tool
 
-load_dotenv() #Read .env file
-
-model_name = os.getenv(key="MODEL_NAME")
-if not model_name:
-    raise SystemError("MODEL_NAME is not set in .env file (e.g., 'openai:gpt-6').")
+# llm = init_chat_model(
+#     model="gpt-6",
+#     model_provider="openai",
+# )
 
 llm = init_chat_model(
-    model=os.getenv("MODEL_NAME"),
-   # temperature=os.getenv(key="TEMPERATURE"),
-    api_key=os.getenv(key="API_KEY")
+    model="gemma4:31b-cloud",
+    model_provider="ollama",
 )
 
-question = input("You: ")
-response = llm.invoke(input=question)
-print("Bot:", response.text)
-
-value = [5, 6, 7, 8, {"key": "value"}]
-
-SYSTEM_PROMPT = "You are a helpful assistant."
+#langchain_openai 
 
 history = [
-    {"role": "system", "content": SYSTEM_PROMPT},  #System message
-
+    {"role": "system", "content": "You are helpful AI assitant"},   # System Message
 ]
 
+@tool
+def get_time() -> str:
+    """Return current local time"""
+    return datetime.now().strftime(format="%H:%T")
+
+#tool bind
+#Agentic loop
+
 while True:
-    try:
-        print()
-        question = input("You: ").strip()
-    except (KeyboardInterrupt, EOFError):
-        print("\nGoodbye!")
+    question = input("You: ").strip()
+
+    if question in {"exit", "bye", "quit"}:
         break
 
-    if not question:
-        continue
+    history.append({"role": "user", "content": question})
 
-    if question.lower() in ("exit", "quit", "bye"):
-        print("Goodbye!")
-        break
-
-    history.append({"role": "user", "content": question})   #User message
     print("Bot: ", end="", flush=True)
-   # response = llm.invoke(input=history)    #AI message
+    full= None
+    completed = True
 
-    full = None  # None | AIMessageChunk
     try:
         for chunk in llm.stream(input=history):
-                print(chunk.text, end="", flush=True)  # print the chunk as it arrives
-                full = chunk if full is None else full + chunk
+            print(chunk.text, end="", flush=True)   # AI Message Chunck
+            full = chunk if full is None else full + chunk
+        completed = True
         print()
-
     except KeyboardInterrupt:
-        print("\n[Interrupted]")
-    except Exception as e:
-        print(f"\n[Error: {e}]")
+        print("\n[interupt]")
+    except Exception as err:
+        print(f"\n[error {err}]")
 
-    if not full and full.text: # pyright: ignore[reportOptionalMemberAccess]
-        history.append(full)  # pyright: ignore[reportArgumentType] # AI message
+    if full is not None and full.text:
+        history.append(full)
     else:
-        history.pop()  # remove the last user message if no response was generated
-
+        history.pop()
