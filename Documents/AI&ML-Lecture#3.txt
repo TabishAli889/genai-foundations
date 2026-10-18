@@ -1,0 +1,54 @@
+Unsloth AI- to quantize models
+
+chatbot-> frontend
+	|
+	Backend->AI logic
+		|
+		REST APIs
+
+streamlit run app.py
+
+AI Eng.
+	-Prompt Eng.
+	-Context Eng.
+	-Harness Eng.
+	-Loop Eng.
+	-Graph Eng.
+	-Eval. Eng.
+
+Agents
+	-Harness		|
+	-Loop			|---> Claude Code, Codex
+	-Graph->flow, MAS	|
+
+If we want to create Agents
+	-SKDs-->Ollama, Openai, Anthropic
+	-Agent SDKs-->OpenAI Agent SDK, Claude Agent SDK, Strands Agents
+
+AI Agents Framework
+	-LangGraph
+	-CrewAI
+	-AutoGen
+	-LlamaIndex
+	-Haystack
+
+_________
+Python: 
+---------
+
+Python UDF(user-defined function)
+
+def function-name():
+	body
+
+Classes & Objects:
+
+object/instance(in class)
+	-attributes/data
+		-class attributes
+		-instance attributes
+	-methods/functions
+		-instance methodss
+		-class methods
+		-state 	methods
+		-magic methods
